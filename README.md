@@ -17,3 +17,10 @@ Node Package Management 약어로, 노드 패키지들을 관리해주는 모듈
 2016년 페이스북, 구글 등이 만든 npm 의 일종이다. 속도는 빠르고 보안적인 이슈도 npm 에 비해 적다고 한다.
 
 ### ECMA6
+
+- const
+- let
+
+### start
+
+- create-react-app
