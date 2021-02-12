@@ -111,7 +111,3 @@ promise.then(function(value) {
 
 promise 로 사용 할 시 이와 같이 먼저 값을 전달하고 함수를 추후에 정의하여 해당 로직을 나중에 돌리는 식으로 제어가 가능하다.
 (자세한걸 나중에 정의 필요)
-
-### start
-
-- create-react-app
