@@ -49,4 +49,4 @@ rendering 할 경우 변경되는 부분 즉, h2 의 시간 부분만 1초마다
 [여기](https://ko.reactjs.org/redirect-to-codepen/rendering-elements/update-rendered-element) 에서 개발자 도구를 통해 확인해보면
 모든 요소가 그대로이되, 1초마다 new Date 부분만 바뀌어지는 것을 확인 할 수 있다.
 
-이러한 '마법' 이 통하는 이유는 React element 의 state 와 react life cycle 덕분인데, 다음 장에서 다룬다.
+이러한 '마법' 이 통하는 이유는 React element 의 props, state 와 react life cycle 덕분인데, 다음 장에서 다룬다.
