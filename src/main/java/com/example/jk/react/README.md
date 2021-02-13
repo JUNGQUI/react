@@ -1,3 +1,0 @@
-### start
-
-- create-react-app
