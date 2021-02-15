@@ -166,3 +166,5 @@ ReactDOM.render(
   document.getElementById('root')
 );
 ```
+
+이와 같은 형태를 띄게 된다.
