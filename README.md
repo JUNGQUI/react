@@ -98,7 +98,9 @@ console.log("Hi!");
 ```
 
 > Promise
+>
 > Hi!
+>
 > Resolved.
 
 ```javascript
