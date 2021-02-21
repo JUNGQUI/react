@@ -129,3 +129,29 @@ class Toggle extends React.Component {
 > 
 > 물론 내부에서 state 를 변경하지 않는 function 이라면 그대로 bind() 로 (parameter 없이) 진행을 해도 괜찮다.
 > ~~근데 이러면 react function 이 아니잖아...~~
+
+아래와 같은 html tag 를 살펴보자.
+
+button 에 deleteRow function 을 onClick 에 mapping 한다.
+
+여기서 deleteRow 는 지우고자 하는 element id 를 받아서 delete 를 수행한다.
+
+이 때, arrow function 을 이용하면 id 이후에 e (react 의 event, preventDefault 등을 의미) 를 전달해주어야 하고, bind 를 사용 할 경우 props 를 뜻하는 this 를 mapping 하고 id 를 바인딩 해준다.
+
+그렇다고 bind 를 통하면 event e 가 전달되는 것이 아니라 bind 내부에서 자동으로 e를 mapping 해준다.
+
+```javascript
+<button onClick={(e) => this.deleteRow(id, e)}>Delete Row</button>
+<button onClick={this.deleteRow.bind(this, id)}>Delete Row</button>
+```
+
+결과적으로 두 tag 모두 동일한 의미를 가지고 있다.
+
+
+### 결론
+
+1. onClick 을 통해 function mapping 시 JSX 처럼 함수로 전달
+2. function 이 component 내에 있어 파라미터 전달을 한다면
+    1. arrow function 을 이용
+    2. bind function 을 이용
+    3. 만약, state 로만 제어를 한다면 constructor 내에서 해당 function 을 bind 해서 사용 가능
