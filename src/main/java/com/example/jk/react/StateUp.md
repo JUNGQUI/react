@@ -110,7 +110,18 @@ class Calculator extends React.Component {
 
 TemperatureInput 컴포넌트 내에 onTemperatureChange props 를 추가하여 함수를 여기에서 mapping 해준다.
 
-이렇게 함으로써 `상위 컴포넌트내 props 를 통해 하위 여러 컴포넌트에 값을 부여` 할 수 있게 된다.
+이렇게 함으로써
+
+1. 하위 컴포넌트 (TemperatureInput) 에서 onChange 가 발생할 경우 해당 컴포넌트의 `handleChange` 이벤트를 호출하고
+2. 이렇게 호출된 `handleChange` 이벤트는 props 로 받은 onTemperatureChange 함수에 전달받은 값을 전달한다
+3. 상위 컴포넌트 (Calculator) 에서 onTemperatureChange 에 mapping 된 이벤트인 
+
+- handleCelsiusChange
+- handleFahrenheitChange
+
+이벤트를 호출하게 되고, 결과적으로 각 컴포넌트에 하나의 state 를 통해 전파가 가능해진다.
+
+이 부분이 바로 `상위 컴포넌트내 props 를 통해 하위 여러 컴포넌트에 값을 부여` 할 수 있게 된다고 할 수 있다.
 
 ### 마무리
 
