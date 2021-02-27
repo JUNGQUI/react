@@ -1,5 +1,7 @@
 바벨 설치
 
+npm init -y : package.json 초기화 
+
 npm install @babel/core @babel/cli @babel/preset-react
 
 - @babel/core           : 코어
