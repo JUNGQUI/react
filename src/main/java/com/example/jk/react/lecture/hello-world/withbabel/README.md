@@ -13,3 +13,9 @@ npx babel --watch src --out-dir . --presets @babel/preset-react
 - --watch : 해당하는 디렉토리를 바라보며 해당 디렉토리 내 소스 변경 시 자동 바벨 실행
 - --out-dir : 해당하는 디렉토리로 output 이 생성
 - --presets : 어떤 기준으로 바벨을 돌릴 지 결정
+
+이와 같은 방식으로 이 프로젝트에서는
+
+babel -> src read -> package json 및 script 를 통해 react load -> ECMA6 로 적용 
+
+의 방식으로 실행된다.
