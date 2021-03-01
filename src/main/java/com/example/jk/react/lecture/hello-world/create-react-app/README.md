@@ -118,6 +118,9 @@ REACT_APP_CUSTOM_ENV=CUSTOM_ENVIRONMENT_DEVELOPMENT
     background-color: $infoColor;
   }
   ```
+  
+공용으로 쓰이는 값들에 대해 scss 파일로 만들고 후에 해당 값을 변수처럼 사용해서 공통으로 쓰는 방법이다.
+
 - css-in-js
 ```javascript
 import styled from 'styled-components';
@@ -132,3 +135,5 @@ const BoxSmall = styled(BoxCommon)`
   weight: 50px;
 `;
 ```
+
+javascript 내에서 CSS 를 사용하는 방식이다. 
