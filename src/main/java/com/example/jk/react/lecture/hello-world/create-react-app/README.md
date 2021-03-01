@@ -68,3 +68,67 @@ console.log(process.env.REACT_APP_CUSTOM_ENV);  // CUSTOM_ENVIRONMENT_DEVELOPMEN
 // .env.development file 내용
 REACT_APP_CUSTOM_ENV=CUSTOM_ENVIRONMENT_DEVELOPMENT
 ```
+
+### CSS
+
+- css : 각자 다른 css file 로 관리
+  - build 시 css 에 정의한 이름이 충돌이 날 수 있음
+- css-module
+  - 모듈처럼 만들어서 build 후 hash 를 통해 접근 가능
+  ```css
+  /*Box.module.css*/
+  .SOME1 {
+  /*...*/
+  }
+  
+  .SOME2 {
+  /*...*/
+  }
+  ```
+
+  ```css
+  /*Button.module.css*/
+  .SOME1 {
+  /*...*/
+  }
+  
+  .SOME2 {
+  /*...*/
+  }
+  ```
+  실제 구현 시 box-SOME1-gfds 형식으로 전달되기에 중복이 발생하지 않는다.
+  ```javascript
+  return <button className={`${Style.SOME1} ${Style.SOME2}`}>큰 버튼</button>
+  ```
+  이와 같이 구현 시 hash 형식의 클래스가 제공되어 중복으로 인한 issue 가 없어진다.
+  ```javascript
+  return <button className={cn(Style.SOME1, Style.SOME2)}>큰 버튼</button>
+  ```
+- css-sass
+  - node-sass 모듈 설치가 필요
+  - scss 형으로 작성
+  ```scss
+  $infoColor: #ffffff;
+  ```
+  ```css
+  @import './SOME.scss';
+  .SOME1 {
+  }
+  .SOME2 {
+    background-color: $infoColor;
+  }
+  ```
+- css-in-js
+```javascript
+import styled from 'styled-components';
+
+const BoxCommon = styled.div`
+  height: 50px;
+`;
+const BoxBig = styled(BoxCommon)`
+  weight: 100px;
+`;
+const BoxSmall = styled(BoxCommon)`
+  weight: 50px;
+`;
+```
