@@ -1,10 +1,11 @@
 function LikeButton() {
-  const [liked, setLiked] = React.useState(false);
+  // setSTATE 의 경우 관용적인 표현이다.
+  const [liked, yahooLiked] = React.useState(false);
   const text = liked ? '좋아요 취소' : '좋아요';
 
   return React.createElement(
       'button'
-      , {onClick : () => setLiked(!liked)}
+      , {onClick : () => yahooLiked(!liked)}
       , text
   )
 }

@@ -1,4 +1,6 @@
-### 
+### webpack
+
+ESM 형태의 파일들
 
 ```javascript
 // file1.js
@@ -15,6 +17,9 @@ import myFunc1, {func2, variable1, variable2} from './file1.js';
 import {func2 as myFunc2} from './file1.js';
 ```
 
+이와 같이 모듈 형식으로 제공을 하는 것을 ESM 이라 볼 수 있다.
+문제는 이러한 방식으로 구현 시 어디선가 꼬인다면 문제 발견이 어렵다는 것과 관리가 힘들다는 것이다.
+
 - npm install webpack webpack-cli react react-dom : 필요 모듈 설치
 - npx webpack : 웹팩 실행
-- 웹팩을 통해 실행 시 react 가 들어있기에 별도 바벨은 필요 없음 (정확히는 바벨은 번역기니까)
+- 웹팩을 통해 실행 시 react 가 들어있기에 별도 실행 불필요
