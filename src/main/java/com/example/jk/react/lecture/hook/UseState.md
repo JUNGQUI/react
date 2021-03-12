@@ -101,6 +101,25 @@ console.log 로 찍히는 게 두번 발생하고, 이는 곧 렌더링이 2회 
 
 그러나 useEffect 를 지우게 되면 값은 2회 증가하지만 로그는 1회만 찍히는데, 이 경우가 배치로 실행됨을 알 수 있다.
 
+```javascript
+function multiStateValue () {
+  const [count1, setCount1] = useState(0);
+  const [count2, setCount2] = useState(0);
+  
+  function onClick() {
+    setCount1(value => value + 1);
+    setCount2(value => value + 1);
+  }
+  
+  if (count1 > count2) {
+    console.log('count1 is bigger than count2');
+  }
+  // ...
+}
+```
+
+위 코드 또한 마찬가지로 항상 false 로 해당 로그는 절대 찍히지 않는다.
+
 #### batchedUpdates
 
 다만 위와 같이 이벤트를 등록해도 강제로 배치처럼 수행하게 작동이 가능하다.
@@ -108,4 +127,44 @@ console.log 로 찍히는 게 두번 발생하고, 이는 곧 렌더링이 2회 
 react-dom 내의 unstable_batchedUpdates() 라는 함수가 있는데, 이 값 안에서 실행을 하게 되면 
 안에서는 배치 형식으로 작동하게 된다.
 
-#### Effect Hook
+#### multi state
+
+useState 를 통해 하나 이상의 값의 변화도 가능하다.
+
+```javascript
+function App() {
+  const [state, setState] = useState({name : '', age : 0});
+  
+  return (
+      <>
+        <p>{state.name}</p>
+        <p>{state.age}</p>
+        <input type="text"
+            value={state.name}
+            onChange={
+              e => {
+                setState({...state, name : e.target.value});
+              }
+            }
+        />
+        <input type="text"
+            value={state.age}
+            onChange={
+              e=> {
+                setState({...state, age: e.target.value});
+              }
+            }
+        />
+      </>
+  );
+}
+```
+
+state 내에 값이 `json 에서 depth 가 생기는 것처럼` depth 하나가 더 추가되는 것이고 그 안에 값들이 나열되는 형식으로 구성을 하면
+useState 를 통해 여러가지 값을 동시에 처리가 가능하다.
+
+이후에 데이터 사용하는 방법은 기존의 json 처럼 . chaining 을 통해 접근 및 사용이 가능하다.
+특이하게 주시해야 할 점은 setState 부분인데, 배열처럼 값들을 나열하고 변경되어야 할 값을 후미에 붙여주는 식으로 업데이트가 가능하다.
+
+저렇게 할 경우 앞에 이미 이전 value 가 있더라도 후미에 붙으면서 가장 최신의 데이터가 덧씌워지기 때문에 값의 업데이트가 일어나게 된다.
+
