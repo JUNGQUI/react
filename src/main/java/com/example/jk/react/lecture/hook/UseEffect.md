@@ -49,3 +49,28 @@ export default function EffectHook() {
 ```
 
 하지만 useEffect 에 두번째 매개변수로 state 값을 주면 해당 값이 변경 될때만 useEffect 가 실행되어 내부 로직을 수행하게 된다.
+
+#### didMount, unmount
+
+리액트 라이프 사이클에서 didMount Unmount 가 있는데, useEffect 를 통해서 해당 효과와 유사하게 구현이 가능하다.
+
+```javascript
+function UseEffect() {
+  useEffect(() => {
+    // ...
+    console.log('did mount');
+    return (() => {
+      console.log('unmount')
+    });
+  }, []);
+}
+```
+
+일단 위에 언급했던 대로 useEffect 의 첫번째 파라미터는 부수효과 시 실행되는 함수, 두번째는 해당 값이 변할 경우 useEffect 가 실행되는 state 를 지정하는 부분이다.
+
+![에러](../../../../../../../resources/UseStateInHookError.png "useState 에서 사용하는 useEffect")
+
+내부에서 호출하는 log 를 보면 알겠지만, 내부에서 사용할 때는 렌더링이 될 때 초기에 호출되고, return 시에는 함수 형태로 전달을 하는데
+unmount 가 되는 시점에 실행이 된다.
+
+즉 라이프 사이클에서 unmount 내에서 실행을 하는 부분을 useEffect 에서 return 을 통해 사용 할 수 있다.
