@@ -50,6 +50,45 @@ export default function EffectHook() {
 
 하지만 useEffect 에 두번째 매개변수로 state 값을 주면 해당 값이 변경 될때만 useEffect 가 실행되어 내부 로직을 수행하게 된다.
 
+이 부분을 의존성 배열이라고 칭한다.
+
+의존성 배열이 비어 있을 경우 최초 1회 렌더링 이후에 실행이 되지 않는데 그 이유는 당연하게도, 리액트에게 `어떠한 값이 변할때 마다 수행해라`
+라는 언급을 해주지 않은 셈이기 때문이다.
+
+이 의존성 배열에 값을 넣을때는 지역 내에서 (function 내에서) 선언된 함수나, 변수를 넣어줘야 하는데, 그 이유로는 내부에서 값이 변경된 것에 대해
+리액트는 반영을 해야 하기 떄문이다.
+
+다만 setState 와 같은 특수한 함수의 경우에는 state 가 불변이고 함수 내용 자체도 불변이기 때문에 넣어주지 않아도 된다.
+
+이와 같이 useEffect 를 사용할 때는 설계적인 부분에서 접근을 해야 하는 경우가 많이 있다.
+
+```javascript
+function SomeComponent() {
+  const [count, setCount] = useState(0);
+  
+  function logging() {
+    console.log({count});
+  }
+  useEffect(() => {
+    console.log('effect on');
+  }, [count, logging]);
+  
+  return <>
+    <p>{count}</p>
+    <button onClick={() => setCount(count + 1)}>증가</button>
+    </>
+}
+```
+
+이와 같은 컴포넌트가 있다고 가정을 해봤을 때 `logging` 함수의 경우 굳이 매 렌더링 시 마다 만들어질 필요도 없고, 해당 함수가 변경 될
+이유도 없다. 
+
+다만 내부에서 생성되어 호출되기 때문에 변경 시 마다 반영이 되게 의존성 배열에 추가가 되어야 하는데 (그렇게 하지 않는다면 린트 에러 발생)
+이 경우 외부에서 호출하여 해당 컴포넌트가 외부의 함수를 쓰는 방식으로 한다면 의존성 배열에 추가될 필요도, 쓸데없이 로직에 끼어들어
+가독성을 낮추지도 않게 된다.
+
+이처럼 설계적인 부분에서 useEffect, useState 등을 잘 사용 해야 한다.
+
 #### didMount, unmount
 
 리액트 라이프 사이클에서 didMount Unmount 가 있는데, useEffect 를 통해서 해당 효과와 유사하게 구현이 가능하다.
