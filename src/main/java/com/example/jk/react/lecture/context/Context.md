@@ -101,12 +101,48 @@ function Greeting() {
 > 
 > 즉, {} 로 전달 할 경우 이전과 동일한 값을 가지고 있더라도 새롭게 렌더링 대상으로 취급하게 된다.
 > 
-> 아래의 코드를 보자
-> 
+> 위에서 언급했던 NonContext 컴포넌트를 다시 보자
+>
 > ```javascript
+> import React, {useState, useContext, createContext} from 'react';
 > 
+> export default function NonContext() {
+>   const [username, setUserName] = useState('mike');
+>   const [age, setAge] = useState(23);
+>   const [count, setCount] = useState(0);
+> 
+>   console.log('rendered');
+>   return (
+>       <>
+>         <LocalProfile username={username} />
+>         <button onClick={() => setCount(count + 1)}>증가</button>
+>       </>
+>   );
+> }
+> 
+> function LocalProfile({username}) { // username 을 새 변수로써 받아옴
+>   console.log('Profile rendered');
+>   return (<div>
+>     <Greeting username={username} />
+>   </div>);
+> }
+> 
+> function Greeting({username}) { // 위와 마찬가지로 새 변수로써 받아옴
+>   console.log('Greeting rendered');
+>   return <p>{`${username}, 안녕!`}</p>;
+> }
 > ```
+> 
+> 해당 부분은 `username` 을 실제로 쓰지 않는 LocalProfile 컴포넌트 아래에 실제로 `username` 을 실제로 쓰는 Greeting 컴포넌트로 인해 
+> 값을 전달하고 있다.
+> 
+> 이로 인해 불필요하게 LocalProfile 도 렌더링이 되고 있는데 이와 같이 {}를 이용해서 전달한다면 실제 username 이 바뀌지 않더라도
+> 상위 컴포넌트가 변경될 경우 {} 로 인해 새로운 '객체' 가 생성이 된다.
+> 
+> 리액트에서는 이를 `변경` 으로 감지해서 하위 컴포넌트들 모두를 다시 렌더링하게 된다.
 
 Context 의 원리는 하위에서 값이 바뀌었을 경우 상위로 Context 를 찾을 때 까지 쭉 올라가면서 검색을 하게 되고
 결과적으로 못찾게 된다면 `const UserContext = createContext({username : 'unknown', age : 0});` 이와 같이
 초기값을 가져와서 렌더링하게 된다.
+
+또한 위에서 언급하였듯이 변경으로 인한 re-rendering 이 실제로 사용하지 않는 컴포넌트에서는 값의 전달이 없으므로 렌더링 대상에 포함되지 않는다.
