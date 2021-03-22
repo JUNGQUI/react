@@ -93,11 +93,11 @@ input 에 값을 입력하면 입력하는데로 input 에 입력이 되고, 버
 set 하게 된다.
 
 ```javascript
-...
+// ...
 const setInitialCallback = useCallback(ref => ref && setText(INITIAL_TEXT), []);
-...
+// ...
 ref={setInitialCallback}
-...
+// ...
 ```
 
 따라서 이와 같이 ref 에 정의가 된 function 을 전달해야 하며, 새로운 함수처럼 느껴지지 않게끔 useCallback 으로 함수를 생성해야 한다.
@@ -137,3 +137,35 @@ const INITIAL_TEXT = '안녕하세요';
 ```
 
 위와 같이 구현하면 정상적으로 작동하게 된다.
+
+비슷한 방식으로 이전 데이터와 현재 state 를 비교하는 형식일때도 이용이 가능하다.
+
+```javascript
+// ...
+const [age, setAge] = useState(20);
+const prevAgeRef = useRef(20);
+useEffect(() => {
+  prevAgeRef.current = age;
+}, [age]);
+// ...
+return (
+    <>
+      // ...
+      <button onClick={() => setAge(/* VALUE */)}>증가</button>
+    </>
+);
+```
+
+이와 같이 구현 할 경우 이전의 age 는 preAgeRef 에, 현재 나이는 age 에 들어가 있게 되고 서로를 비교하는 로직을 완성 할 수 있다.
+
+> 주의해야 할 점
+> 
+> 1. rendering 이후 ref 활용
+> 
+> ref 는 대부분이 DOM object 에 접근해서 처리를 하는 경우가 많기 떄문에 Life Cycle 상 렌더링 이후에 실행되는 useEffect 를 이용해서
+> 사용하기 편하다.
+> 
+> 2. 사용 시점
+> 
+> 위와 동일한 상황의 이야기인데, rendering 이후에 DOM 에서 값(데이터 혹은 event 등)을 가져오기 때문에
+> 잘못된 시점에서 호출 시 null exception 이나 기타 원하는 로직으로 실행이 되지 않을 수 있다.
