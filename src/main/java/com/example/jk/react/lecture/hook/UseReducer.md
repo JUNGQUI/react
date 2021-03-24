@@ -52,3 +52,30 @@ dispatch 에 입력받는 파라미터는 항상 객체 형식이며, 이 객체
 
 위의 로직에서 개발자의 입김(?) 이 들어간 부분은 state 설정과 dispatch 를 통해 전달되는 action 뿐이며 그 말인 즉슨,
 action.KEY 의 경우 개발자의 커스텀 부분이라는 뜻이다.
+
+### with context API
+
+dispatch 는 함수 형식을 띄고 이를 통해 state 를 관리하기에 context API 와 같이 사용하면 하위 컴포넌트들에도 별도의
+값 전달 없이 사용이 가능하다.
+
+```javascript
+const ProfileContext = useContext();
+
+// ...
+
+const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+
+return (
+    <>
+      // ...
+      <ProfileContext.Provider value={dispatch}>
+        <SOME_COMPONENT />
+      </ProfileContext.Provider>
+      // ...
+    </>
+);
+// ...
+```
+
+위 코드처럼 dispatch 자체를 context API 를 통해 제공한다면 하위의 (혹은 n depth 의 컴포넌트) 에서도 상위 (혹은 root) 컴포넌트에서
+사용하던 reducer 를 그대로 사용이 가능하다.
