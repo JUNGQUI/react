@@ -19,3 +19,14 @@ export default function User({male, age, type, onChangeName, onChangeTitle}) {
   // ...
 }
 ```
+
+이와 같이 선언해주고 실제 컴포넌트를 사용하는 부분에서 사용 시
+
+```javascript
+// ...
+<User male={/**/} /*...*/ >
+</User>
+// ...
+```
+
+이와 같이 사용 시 컴포넌트에 대응되는 값을 넣어주면 된다.
