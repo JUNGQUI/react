@@ -137,3 +137,52 @@ useEffect(() => {
 그래서 useCallback 을 이용해서 변경이 일어날때만 함수를 생성하게 하고, 그런 함수의 변경을 감지해 useEffect 가 발생하게 해야
 useEffect 내 함수를 async 를 이용해서 구현 할 수 있다.
 
+#### 실행 시점
+
+의존성 배열을 과도하게 사용 할 경우 관리에 어려움이 발생하는데, 의존성 배열 대신 useEffect 내에서 state 값에 따라 시점을 지정하게
+(전통적인 방식의 if 등) 진행하면 시점 적용하기에도, 사용하기에도 편리한다.
+
+이렇게 관리 할 경우 useCallback 을 사용할 필요도 없고 값의 최신화도 되기 때문에 편리하게 사용이 가능하다.
+
+> useEffect 최신화 값 사용
+> 
+> 의존성 배열에 '아무런 값도 입력하지 않으면' useEffect 내에서 사용하는 state 의 경우 자동으로 최신화된 값을 사용한다.
+> 
+> 이를 이용해 위에서처럼 if condition 과 state 로 편리하게 시점 조정이 가능하다.
+
+```javascript
+function profile({userId}) {
+  const [user, setUser] = useState('');
+  useEffect(() => {
+    if(!user || user.id !== userId) {
+      console.log('function call');
+    }
+  }); // 의존성 배열이 '아예' 없음
+}
+```
+
+#### 이전 값 처리
+
+마찬가지로, 의존성 배열을 주지 않고 실행해도 이전의 상태값을 가져 올 수 있다. 사실 앞서 `setState` 를 통해 이미 알고 있는 부분인데,
+`setState` 의 파라미터로 값을 주는게 아닌 함수를 제공할 경우 이전의 상태값을 가져와 로직을 진행한다.
+
+```javascript
+// ...
+const [value, setValue] = useState(0);
+
+useEffect(() => {
+  setValue(value => value + 1); // 이전 상태값을 'value' 라는 이름으로 사용, 로직 진행 후 결과 리턴
+  // ...
+})
+// ...
+```
+
+#### multiple condition
+
+여러 객체에 대해서도 이와 같이 사용이 가능하다. 크게 두가지 방법이 있는데, useReducer 를 이용하는 것과 해당 다수의 상태값을
+하나의 객체로 만들어 useState 를 통해 관리하는 것이다.
+
+useState 로 관리하는것도 방법이긴 하나, 체계적으로 로직에 맞춰 값이 변경되는 부분들을 하나의 객체로 묶어서 사용하기에는 여러모로 부담이
+있고 가독성 측면에도 좋지 않아 reducer 를 사용하는게 용이하다.
+
+[useReducer](../hook/UseReducer.md) 는 여기에 설명되어 있다.
