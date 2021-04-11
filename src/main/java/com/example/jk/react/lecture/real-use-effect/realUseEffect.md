@@ -186,3 +186,43 @@ useState 로 관리하는것도 방법이긴 하나, 체계적으로 로직에 �
 있고 가독성 측면에도 좋지 않아 reducer 를 사용하는게 용이하다.
 
 [useReducer](../hook/UseReducer.md) 는 여기에 설명되어 있다.
+
+#### 함수 제어
+
+```javascript
+function SomeComponent({onClick}) {
+  useEffect(() => {
+    window.addEventListener('click', () => {
+      onClick();
+    })
+  }, [onClick]);
+}
+```
+
+하위 컴포넌트 내에 위와 같이 상위로부터 받은 function 에 대해 사용을 하게 될 수 있다. 이렇게 사용 할 경우 상위로부터 받는 onClick 함수가
+변경될 때 마다 useEffect 가 변경되어야 하므로 의존성 배열에 추가가 필요하고 이는 앞서 우리가 이야기한 부분에 대해 부합되지 않기에 변경이 필요하다.
+
+이럴 때 useRef 를 이용하면 의존성 배열 없이 사용이 가능하다.
+
+```javascript
+function SomeComponent({onClick}) {
+  const onClickRef = useRef();
+  useEffect(() => {
+    onClickRef.current = onClick;
+  });
+  useEffect(() => {
+    window.addEventListener('click', () => {
+      onClickRef.current();
+    });
+  });
+}
+```
+
+이렇게 사용 할 경우 변경이 일어나도 ref 를 통해 접근하기에 최신화된 값을 가져오게 되고 그 이벤트를 사용하게 된다.
+
+주의해야 할 점은 ref 객체를 변경할때도 useEffect 를 사용하는데, 이렇게 변경하는 이유는 렌더링과 연관이 있다.
+
+만약 useEffect 내에서가 아니라 바깥에서 ref 객체를 수정 할 경우 concurrent Mode 에서 렌더링 도중 실패할 경우
+렌더링은 실패했지만 ref 는 수정이 되는 데이터가 꼬이는 상황이 발생 할 수 있다.
+
+이러한 부분을 제어하기 위해 리액트 life cycle 에서 렌더링 이후 실행되는 useEffect 를 사용하여 변경을 하는 것이다.
