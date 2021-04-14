@@ -145,10 +145,38 @@ function MainComponent() {
 
 새로운 함수가 아니라 상태값에서도 동일하게 사용이 가능하다.
 
+#### 불변객체로 관리
+
 ```javascript
 function MyComponent() {
-  //...
-  
+  // ...
+  const newFruit = [{name: 'peach', price : 3000}];
+  FRUIT.push(newFruit);
+  // ...
+}
+
+const FRUIT = [
+  {name : 'apple', price : 1000},
+  {name : 'pineapple', price : 2000},
+  {name : 'watermelon', price : 5000}
+]
+```
+
+위와 같은 배열형태의 `FRUIT` 이 있고, 동일한 타입으로 `newFruit` 으로 선언해서 push 를 했다고 가정하자.
+
+javascript 에서 에러도 없고, 정상적으로 값을 불러올 수 있을텐데, 이 FRUIT 이 상태값이 된다면 이야기가 달라진다.
+
+일단, 상태값의 변화를 감지하지 못한다. 그 이유로는 기존의 상태값 자체도 setState 를 통해 접근이 된 것도 아니고, 단순히 값에
+push 를 한것은 local 에서만 적용이 되는 부분이기에 FRUIT 을 상태값으로써 활용 할 경우 정상적인 변화 감지가 안되어 렌더링이 이루어지지 않는다.
+
+그래서 상태값의 경우 정상적으로 값 변화를 일으키기 위해서는 아래와 같이 구현해야 한다.
+
+```javascript
+function MyComponent() {
+  // ...
+  const newFruit = [{name: 'peach', price : 3000}];
+  setFRUIT([...FRUIT, newFruit]); // setState 를 통해 값을 수정하며, 불변객체 형식으로 만들어 변화를 감지한다.
+  // ...
 }
 
 const FRUIT = [
