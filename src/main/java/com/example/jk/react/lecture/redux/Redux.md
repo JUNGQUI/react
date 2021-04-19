@@ -70,7 +70,13 @@ Product 컴포넌트에서도 이 상태값의 변경을 감지, 전체 컴포�
 하지만 그렇게 할 경우 코드가 굉장히 길어지며, 만약 해당 상태값 객체에 계속 요소가 추가된다면 가독성에도 문제가 발생하고
 리액트 트리 구조도 불필요하게 커진다.
 
-이를 위해 리덕스가 등장할 수 있다.
+이를 위해 redux 가 활용될 수 있다.
+
+쉽게 이야기 하자면, Context API 도, redux 도 기존의 컴포넌트들에서 여기저기 쓰이던 useState 를 통한 상태값 변경에 대해 
+일괄적으로 한 곳에서 상태값에 대해 변경 할 수 있다는 것이고, 이는 곧 관리 포인트가 적어진다는 것이고 가독성 및 데이터 자체의 무결성 등에 영향을 미친다.
+
+다만 Context API 는 필요에 따라 n 개의 리액트 엘리먼트 및 context 가 필요하지만 redux 의 경우 하나의 Provider 로 여러 state 를 동시에 관리가 가능하며
+이를 통해 불필요한 렌더링 또한 막아주기에 resource 차원에서도 이점이 있다.
 
 ```javascript
 import React from 'react';
@@ -266,3 +272,126 @@ cancel(); // return 으로 cancel '함수' 를 받았기 때문에 전달받은 
 > 있다고 판단하고 체이닝을 하고, 아닐 경우 null 로 값이 들어가게 된다.
 > 
 > 따라서 위의 if(action.meta?delay) 의 경우 meta 가 있을경우 delay 를 가져와보고 delay 가 없거나 meata 가 없을 경우 실행이 되지 않는다.
+
+#### 리듀서
+
+앞서 이야기 했듯이 리덕스에서 상태값에 대해 일괄적으로 관리가 가능하다고 했는데, 리듀서가 바로 이 로직의 핵심 부분을 담당한다.
+
+정확히 말하자면, 리덕스의 경우 리액트에서 유래되었으나 리액트에서만 쓸 수 있는 것은 아니다.
+
+순수 자바스크립트 내에서도 리듀서를 이용해서 변수등을 일괄 관리 할 수 있다. 다만 리액트에서부터 유래되었기에 리덕스와 궁합이 굉장히 좋다.
+
+```javascript
+import produce from 'immer';
+
+const ADD = "customReducerAdd";
+const DELETE = "customReducerDelete";
+
+function customReducer(state = INITIAL_STATE, action) {
+  return produce(state, draft => {
+    switch (action.type) {
+      case ADD:
+        // draft.user.push(SOME_USER);
+        // draft.users[0].name = 'OTHER NAME';
+      case DELETE:
+        // ...
+    }
+  })
+}
+```
+
+위의 `customReducer` 가 리듀서 역할을 수행하는 함수인데, 파라미터로 두 가지를 받는다.
+
+첫번째 파라미터는 현재 적용이 될 state, 두번째 파라미터는 리듀서 가 수행할 action 이다.
+
+action 에는 기본적으로 type 이 속성값으로 존재하며 이 action 을 통해 리듀서 내부 로직에서 액션에 따라 수행을 진행하면 된다.
+
+> produce?
+> 
+> immer 패키지의 produce 는 불변객체로 관리하는 reducer 에서 불편한 부분을 개선하기 위해 사용하는 패키지이다.
+> 
+> 기본적인 활용법은 리듀서 내에 produce 로 한번 더 함수로 감싸서 그 내부에서 state 변경에 대해 처리하는 것인데, 그렇다면 그냥 리듀서와 다른점이
+> 무엇이냐면, 불변 객체에 대한 처리 방법이다.
+> 
+> ```javascript
+> const someState = {
+>   user : {
+>     name : 'mike',
+>     age : 25
+>   },
+>   product : 'iPhone'
+> }
+> ```
+> 
+> 위와 같은 구조가 있고 이를 리듀서를 이용해 수정을 한다고 가정을 하면 일반적으로 불변객체로 존재해야 하기에 name 을 수정하더라도
+> `{...someState, user.name : 'mike2'}` 와 같이 불편하게 하나 하나 지정을 해야 한다.
+> 
+> 그러나 produce 를 이용하면 `draft.user.name = 'mike2'` 와 같이 변경하고자 하는 state 만 수정해도 이전과 같이 불변객체로
+> 사용이 가능하다.
+
+> 주의
+>
+> 리듀서 내부에서 랜덤 함수, 타이머 등을 이용해서 상시 변화가 가능한 값이나, 리듀서 내에서 서버 호출을 통해 값이 바뀔 수 있는 것에 대해서는
+> 변화가 없게 개발해야 한다.
+> 
+> 내부에서 어떤 요인에 의해 값이 항상 다르게 바뀐다면 시점과 연결되어 있는 리듀서 특성상 치명적으로 다가온다.
+> 
+> 그렇기에 리듀서는 순수 함수로써 작동해야 한다.
+> 
+> 또한 값을 변경할때도 주의를 해야 하는데, 하나의 객체를 선택하고 그 객체 안의 속성값을 변경할 때 정상적으로 변경이 되지 않을 수 있다.
+> 
+> 그 이유는 객체를 변경하고 그 안에 속성값을 변경 시 변경 시점에서 바라보고 있는 객체는 이전 객체의 레퍼런스 일 수 있기 떄문이다.
+> 
+> 따라서 객체를 바꾸고 그 안의 속성도 바꾼다고 할 떄는 레퍼런스 값을 전달해서 제어를 하는 것이 좋다.
+
+#### Store
+
+말 그대로 저장소의 의미를 가지는데, 작업이 끝난 리듀서가 전달해준 state 를 저장하는 역할을 수행한다.
+
+또한 앞서 이야기 한 미들웨어와 리듀서를 연결해주는 역할도 하며 subscribe() 를 이용해서 디스패치를 통해 실행된 리듀서 이후 로직에 대해
+수행도 가능하다.
+
+위에서 작성한 함수를 보면
+
+```javascript
+// ...
+export default function App() {
+  return (
+      <Provider store={store}>
+        <User/>
+        <Product/>
+      </Provider>
+  )
+}
+// ...
+function reducer (state, action) {
+  switch (action.type) {
+    case 'setUserName':
+      return {...state.user, name:action.name}
+  }
+}
+const store = createStore(reducer);
+// ...
+```
+
+리듀서를 정의하고 createStore 를 통해 리듀서와 연결해준다. 이후 Provider 리액트 엘리먼트를 통해 store 가 실행되고 디스패치를 통해(store.dispatch({type: ...}))
+전달되는 action 에 따라 리듀서가 실행된다.
+
+이렇게 저장되는 state 에 대해서 Provider 리액트 엘리먼트 안의 컴포넌트는 store 를 통해 접근이 가능하고 사용하게 된다.
+
+```javascript
+// ...
+let prevState;
+store.subscribe(() => {
+  const state = store.getState();
+  if (prevState !== state) {
+    console.log('diff');
+  } else {
+    console.log('same');
+  }
+  prevState = state;
+})
+// ...
+```
+
+위와 같이 사용을 하면 리듀서 진행 후 값에 대해 접근하여 후처리가 가능하다.
