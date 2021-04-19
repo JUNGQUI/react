@@ -329,4 +329,69 @@ action 에는 기본적으로 type 이 속성값으로 존재하며 이 action �
 > 그러나 produce 를 이용하면 `draft.user.name = 'mike2'` 와 같이 변경하고자 하는 state 만 수정해도 이전과 같이 불변객체로
 > 사용이 가능하다.
 
+> 주의
+>
+> 리듀서 내부에서 랜덤 함수, 타이머 등을 이용해서 상시 변화가 가능한 값이나, 리듀서 내에서 서버 호출을 통해 값이 바뀔 수 있는 것에 대해서는
+> 변화가 없게 개발해야 한다.
+> 
+> 내부에서 어떤 요인에 의해 값이 항상 다르게 바뀐다면 시점과 연결되어 있는 리듀서 특성상 치명적으로 다가온다.
+> 
+> 그렇기에 리듀서는 순수 함수로써 작동해야 한다.
+> 
+> 또한 값을 변경할때도 주의를 해야 하는데, 하나의 객체를 선택하고 그 객체 안의 속성값을 변경할 때 정상적으로 변경이 되지 않을 수 있다.
+> 
+> 그 이유는 객체를 변경하고 그 안에 속성값을 변경 시 변경 시점에서 바라보고 있는 객체는 이전 객체의 레퍼런스 일 수 있기 떄문이다.
+> 
+> 따라서 객체를 바꾸고 그 안의 속성도 바꾼다고 할 떄는 레퍼런스 값을 전달해서 제어를 하는 것이 좋다.
+
 #### Store
+
+말 그대로 저장소의 의미를 가지는데, 작업이 끝난 리듀서가 전달해준 state 를 저장하는 역할을 수행한다.
+
+또한 앞서 이야기 한 미들웨어와 리듀서를 연결해주는 역할도 하며 subscribe() 를 이용해서 디스패치를 통해 실행된 리듀서 이후 로직에 대해
+수행도 가능하다.
+
+위에서 작성한 함수를 보면
+
+```javascript
+// ...
+export default function App() {
+  return (
+      <Provider store={store}>
+        <User/>
+        <Product/>
+      </Provider>
+  )
+}
+// ...
+function reducer (state, action) {
+  switch (action.type) {
+    case 'setUserName':
+      return {...state.user, name:action.name}
+  }
+}
+const store = createStore(reducer);
+// ...
+```
+
+리듀서를 정의하고 createStore 를 통해 리듀서와 연결해준다. 이후 Provider 리액트 엘리먼트를 통해 store 가 실행되고 디스패치를 통해(store.dispatch({type: ...}))
+전달되는 action 에 따라 리듀서가 실행된다.
+
+이렇게 저장되는 state 에 대해서 Provider 리액트 엘리먼트 안의 컴포넌트는 store 를 통해 접근이 가능하고 사용하게 된다.
+
+```javascript
+// ...
+let prevState;
+store.subscribe(() => {
+  const state = store.getState();
+  if (prevState !== state) {
+    console.log('diff');
+  } else {
+    console.log('same');
+  }
+  prevState = state;
+})
+// ...
+```
+
+위와 같이 사용을 하면 리듀서 진행 후 값에 대해 접근하여 후처리가 가능하다.
