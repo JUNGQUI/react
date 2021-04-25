@@ -344,6 +344,28 @@ action 에는 기본적으로 type 이 속성값으로 존재하며 이 action �
 > 
 > 따라서 객체를 바꾸고 그 안의 속성도 바꾼다고 할 떄는 레퍼런스 값을 전달해서 제어를 하는 것이 좋다.
 
+사실 조금 더 간편하게 사용이 가능한 방법이 있다.
+
+```javascript
+const ADD = "customReducerAdd";
+const DELETE = "customReducerDelete";
+
+const customReducer = createReducer(INITIAL_STATE, {
+  [ADD] : (state, action) => {
+    // draft.user.push(SOME_USER);
+    // draft.users[0].name = 'OTHER NAME';
+  },
+  [DELETE] : (state, action) => {
+    // ...
+  },
+})
+```
+
+바로 `createReducer` 를 이용하는 것이다. 리덕스에서 사용이 가능한 reducer 제공 함수로 첫번째 파라미터에 state, 두번째 파라미터에
+action 에 따른 switch 를 대신해서 지정을 하면 자연스럽게 위에서 사용했던 리듀서와 동일하게 사용이 가능하다.
+
+참고 : [여기](https://redux-toolkit.js.org/api/createReducer)
+
 #### Store
 
 말 그대로 저장소의 의미를 가지는데, 작업이 끝난 리듀서가 전달해준 state 를 저장하는 역할을 수행한다.
@@ -395,3 +417,59 @@ store.subscribe(() => {
 ```
 
 위와 같이 사용을 하면 리듀서 진행 후 값에 대해 접근하여 후처리가 가능하다.
+
+#### 리덕스 없이 리덕스 구현하기
+```javascript
+const ADD = "customReducerAdd";
+const DELETE = "customReducerDelete";
+
+export const addAction = state => ({type : ADD, state});
+export const deleteAction = state => ({type : ADD, state});
+
+export const customReducer = createReducer(INITIAL_STATE, {
+  [ADD] : (state, action) => {
+    // draft.user.push(SOME_USER);
+    // draft.users[0].name = 'OTHER NAME';
+  },
+  [DELETE] : (state, action) => {
+    // ...
+  },
+})
+```
+
+```javascript
+import addAction from '...';
+
+function SomeComponent() {
+  const [state, setState] = useState(0);
+  // ...
+  store.dispatch(addAction(state));
+  // ...
+}
+```
+
+위와 같은 방식의 컴포넌트가 있다고 가정해보자. (리듀서로 불러와서 매핑은 끝났다고 가정)
+
+위 상황에서 state 를 업데이트를 하면 SomeComponent 의 경우 state 가 바뀌었기에 항상 렌더링이 될 것이다. 하지만 이 컴포넌트가
+단독으로 쓰이는 것이 아니고, state 에 위에서 언급한 부분외 별도의 상태값이 존재 할 경우 실제 state 의 변경과는 관계 없이 항상 렌더링이 될 것이다.
+
+이를 방지하기 위해 
+
+```javascript
+  // ...
+  const prevState = state;
+  store.dispatch(() => {
+    let state = state;
+    if (prevState !== state) {
+      addAction(state);
+    }
+  });
+  // ...
+```
+
+위와 같이 실제 state 의 변경이 일어났는지를 확인하는 코드 작성이 필요하다.
+
+TODO
+
+- [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
+- 실제 리액트-리덕스의 경우 위와 같은 경우를 어떻게 해결하는지 추가
