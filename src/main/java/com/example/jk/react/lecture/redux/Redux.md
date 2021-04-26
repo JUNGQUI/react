@@ -347,8 +347,8 @@ action 에는 기본적으로 type 이 속성값으로 존재하며 이 action �
 사실 조금 더 간편하게 사용이 가능한 방법이 있다.
 
 ```javascript
-const ADD = "customReducerAdd";
-const DELETE = "customReducerDelete";
+const ADD = createAction('add')
+const DELETE = createAction('delete')
 
 const customReducer = createReducer(INITIAL_STATE, {
   [ADD] : (state, action) => {
