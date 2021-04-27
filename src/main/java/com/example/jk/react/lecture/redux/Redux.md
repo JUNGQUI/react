@@ -347,8 +347,8 @@ action 에는 기본적으로 type 이 속성값으로 존재하며 이 action �
 사실 조금 더 간편하게 사용이 가능한 방법이 있다.
 
 ```javascript
-const ADD = "customReducerAdd";
-const DELETE = "customReducerDelete";
+const ADD = createAction('add')
+const DELETE = createAction('delete')
 
 const customReducer = createReducer(INITIAL_STATE, {
   [ADD] : (state, action) => {
@@ -468,8 +468,3 @@ function SomeComponent() {
 ```
 
 위와 같이 실제 state 의 변경이 일어났는지를 확인하는 코드 작성이 필요하다.
-
-TODO
-
-- [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
-- 실제 리액트-리덕스의 경우 위와 같은 경우를 어떻게 해결하는지 추가
