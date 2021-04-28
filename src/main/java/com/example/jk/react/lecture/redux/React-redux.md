@@ -158,3 +158,22 @@ default export function App () {
 ```
 
 이와 같이 useDispatch 훅을 이용해서 사용이 가능하다.
+
+#### reselect
+
+컴포넌트에서 객체를 사용 할 경우 전체 객체에 대해 접근을 하는 경우가 많다.
+
+```javascript
+// ...
+function ChildComponent({someValue}) {
+  // ...
+  // use someValue for doing something
+  // ...
+}
+```
+
+그런데, 여기에서 filter 등을 이용해서 작업을 할 경우 전체 컴포넌트에서 불필요하게 불러와지는 부분이 있다.
+
+filter 의 조건에 따라 미리 list 를 나눠서 상태값으로 관리를 한다면 문제가 되진 않지만, 실제로 그렇게 하더라도 중복으로 결정이 될 수 있는
+조건이 있다면 list 자체에도 데이터 중복이 들어갈 수 있다.
+

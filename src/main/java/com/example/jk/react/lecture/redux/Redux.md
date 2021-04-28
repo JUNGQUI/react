@@ -362,9 +362,52 @@ const customReducer = createReducer(INITIAL_STATE, {
 ```
 
 바로 `createReducer` 를 이용하는 것이다. 리덕스에서 사용이 가능한 reducer 제공 함수로 첫번째 파라미터에 state, 두번째 파라미터에
-action 에 따른 switch 를 대신해서 지정을 하면 자연스럽게 위에서 사용했던 리듀서와 동일하게 사용이 가능하다.
+action 맵을 입력하면 자연스럽게 위에서 사용했던 리듀서와 동일하게 사용이 가능하다.
 
-참고 : [여기](https://redux-toolkit.js.org/api/createReducer)
+참고 : [여기](https://redux-toolkit.js.org/api/createReducer#parameters-4)
+
+> 액션 생성자 함수, createAction
+> 
+> 위에서 ADD 를 통해 action 을 지정해주었는데, createAction 이후 어떻게 리듀서에 값이 전달되는지 생략되어 있다.
+> 
+> 원리는 다음과 같다.
+> 
+> ```javascript
+> function customReducer(state = INITIAL_STATE, action) {
+>   return produce(state, draft => {
+>     switch (action.type) {
+>       case ADD:
+>         // draft.user.push(SOME_USER);
+>         // draft.users[0].name = 'OTHER NAME';
+>       case DELETE:
+>         // ...
+>     }
+>   })
+> }
+> ```
+> 위 코드와 같이 리듀서는 초기 state, action 을 받고 action 에 따라 작동하게 되는데, 이 부분에서 action.type 의 경우 상수처럼 사용될 필요성이 있다.
+> ```javascript
+> // ...
+> const ADD = 'add';
+> // ...
+> ```
+> 그래서 이와 같이 구현이 되었는데, 이 부분에 대해서 조금 더 custom 하게 작동하도록 state 까지 전달해주니
+>
+> ```javascript
+> // ...
+> const ADD = 'add';
+> export const ADDAction = (state) => ({
+>   type : ADD, state
+> });
+> // ...
+> ``` 
+> 이와 같이 지정하는 식으로 발전(?)되었다. 타입을 상수로 변경해서 변경 불가능하게 만들고 액션을 그때 그때 state 를 받아 액션 객체를 생성 후
+> 반환하게 하는 역할이 바로 위 함수이고 `액션 생성자` 라 칭한다.
+> 
+> 그리고 훅이 출현하면서 이 부분에 대해서도 변화가 생겼고 그 부분이 바로 위에서 사용한 `createAction` 이다.
+> 
+> type 은 상수로써 그때 그때 선언해서 지정해주고 값의 경우 store 에 저장된 state, 혹은 state 자체를 전달하면 reducer 는 액션에 맞게
+> 받은 값(state or value) 에 대해 작업을 진행하게 된다.
 
 #### Store
 
