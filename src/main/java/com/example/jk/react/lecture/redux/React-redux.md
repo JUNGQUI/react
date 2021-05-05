@@ -135,7 +135,7 @@ const customReducer = createReducer(INITIAL_STATE, {
 이와 같이 미리 reducer 를 먼저 생성해주고 (addReducer 에서 값 전달의 경우 `속성값을 전달한다` 고 하고 넘어가자)
 
 ```javascript
-default export function App () {
+function App () {
   // ...
   store.dispatch(addReducuer(store.some.someObj1));
   // ...
@@ -147,7 +147,7 @@ default export function App () {
 물론 이 부분도 훅을 이용해 이쁘게 변경이 가능한데,
 
 ```javascript
-default export function App () {
+function App () {
   // ...
   // store.dispatch(addReducuer(store.some.someObj1));
   // 대신
@@ -172,8 +172,97 @@ function ChildComponent({someValue}) {
 }
 ```
 
-그런데, 여기에서 filter 등을 이용해서 작업을 할 경우 전체 컴포넌트에서 불필요하게 불러와지는 부분이 있다.
+그런데, `childComponent` 내에서 전체 데이터 중 일부만 사용해야 하는 조건이 걸렸다고 가정을 해보자.
 
-filter 의 조건에 따라 미리 list 를 나눠서 상태값으로 관리를 한다면 문제가 되진 않지만, 실제로 그렇게 하더라도 중복으로 결정이 될 수 있는
+filter 등을 이용하면 필요한 데이터만 사용할 수 있다. 그러나 그렇게 할 경우 컴포넌트에서 필요하지 않은 전체 데이터가 불러와지는 부분이 있다.
+
+또한 filter 의 조건에 따라 미리 list 를 나눠서 상태값으로 관리를 한다면 문제가 되진 않지만, 실제로 그렇게 하더라도 중복으로 결정이 될 수 있는
 조건이 있다면 list 자체에도 데이터 중복이 들어갈 수 있다.
 
+예를 들어, 나이라는 조건이 붙고 8~19세 / 18세 이상 이라는 조건이 붙었다고 가정할 때 데이터에서 8~19 와 18세 이상에서는 중복으로 불려와지는 데이터가 존재하게 된다.
+
+이 데이터들을 가공하였을 때 불필요하게 다른 조건에 중복되서 걸리는 데이터들이 수정되어 반대편 조건을 사용하는 컴포넌트에도 렌더링이 되는 등 리소스 낭비가 발생한다.
+
+그리고 또 하나의 문제점은 렌더링 유무와 상관 없이 filter 를 사용하면 값의 변경 유무와 상관 없이 무조건적으로 실행하게 된다는 것이다.
+
+```javascript
+// ...
+const someFilteredVaule = someValue.filter(item => item.SOME_PROPS <= 150);
+// ...
+```
+
+위와 같은 코드가 컴포넌트 내에 내재되어 있다고 가정했을 때, someValue 나 SOME_PROPS 가 변경되지 않아도 해당 필터 작업은 진행이 된다는 것이다.
+
+
+```javascript
+import {createSelector} from 'reselect';
+
+const getFriends = state => state.friend.friends;
+export const getAgeLimit = state => state.friend.ageLimit;
+export const getShowLimit = state => state.friend.showLimit;
+
+export const getFriendWithAgeLimit = createSelector(
+    [getFriends, getAgeLimit]
+    , (friends, ageLimit) => friends.filter(item => item.age <= ageLimit)
+);
+
+export const getFriendWithShowAgeLimit = createSelector(
+    [getFriendWithAgeLimit, getShowLimit]
+    , (friendsWithAgeLimit, showLimit) => friendsWithAgeLimit.slice(0, showLimit)
+);
+```
+
+`createSelector` 함수는 메모이제이션 기능이 있기 때문에 filter 등의 연산을 넣더라도 실제 반영되는 값이 변경되지 않으면 실행이 되지 않고, 이전에 연산했던 결과를 리턴한다.
+
+따라서 앞서 말했듯 불필요한 연산을 피할 수 있다.
+
+또한 이와 같이 구현을 할 때 약간의 팁이라 볼 수 있는것이, reselect 패키지를 이용해서 별도의 파일로 `연산` 과 관계된 모든 코드를 별도의 파일로 분리하여
+구성을 한다면, 화면을 위한 컴포넌트와 로직의 컴포넌트가 분리되 가독성이나 유지보수성 측면에서 이점이 있다.
+
+#### 팁
+
+- 상수값 범용으로 리듀서 구현
+
+상태값을 추가할때 변하지 않는 상수적인 값을 추가한다면 굳이 액션, 액션생성자까지 구현 할 필요 없이 리듀서, 액션을 범용적으로 구현해서 호출 후 사용하는 방식으로 간단히 추가 할 수 있다.
+
+```javascript
+// ...
+export function createSetValueAction(type) {
+  return (type, value) => ({type: type, value});
+}
+
+export function setValueReducer(state, action) {
+  state[action.key] = action.value;
+}
+// ...
+const SET_VALUE = 'COMPONENT/SET_VALUE';
+export const setValue = createSetValueAction(SET_VALUE);
+
+const reducer = createReducer(INITIAL_STATE, {
+  // 이러한 액션들 대신
+  // [SOME_ACTION1] : (state, action) => {state.someValue1 = action.someValue1},
+  // [SOME_ACTION2] : (state, action) => {state.someValue2 = action.someValue2},
+  // [SOME_ACTION3] : (state, action) => {state.someValue3 = action.someValue3},
+  // 이렇게 하나로 관리
+  [SET_VALUE] : setValueReducer,
+  // ...
+});
+// ...
+```
+
+일일이 하나씩 action, action creator 를 만들어 주는 대신 setValue 형식으로 하나의 액션에서 상수 값들에 대한 변경이 가능해진다.
+
+- 액션 크리에이터를 모아서 사용
+
+```javascript
+// ...
+export const actions = {
+  addFriend : friend => ({type : ADD, friend}),
+  removeFriend : friend => ({type : REMOVE, friend}),
+  editFriend : friend => ({type : EDIT, friend}),
+  setValue : createSetValueAction(SET_VALUE)
+}
+```
+
+하나 하나씩을 밖으로 export 하는 것 보단 관리하기 편하게 action 객체 하나를 생성하고 거기에서 필요한 액션을 추출해서 사용하는 것이
+가독성측면에서도, 유지보수성 측면에서도 보기 편하다.
