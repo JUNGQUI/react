@@ -203,6 +203,8 @@ const MyMiddleware = store => next => action => next(action);
 일반적으로 미들웨어는 위와 같이 표현을 하는데, store 를 이용하기 위해 store 를 받고, next 의 경우 다음 작업이 있을 경우
 마치 재귀처럼 다음 함수로 접근하여 로직을 처리한다.
 
+또한 이렇게 중간에서 작업이 되는 특성 덕분에 서버와의 비동기 통신등을 이용 할 때 주로 사용하곤 한다.
+
 ```javascript
 const middle1 = store => next => action => {
   console.log('middle 1 start');
