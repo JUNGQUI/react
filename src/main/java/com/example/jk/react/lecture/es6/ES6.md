@@ -85,3 +85,23 @@ function* iteratorWhile() {
 
 얼핏 보기엔 무한루프이기에 에러가 발생할 것으로 보이지만 제너레이터는 1회 수행 후 yield 에서 제어권을 호출한 쪽으로 넘기기에 단계마다 1씩
 증가된 카운터를 가져 올 수 있다.
+
+또한 next 를 통해 파라미터를 전달해서 그 값을 그대로 사용 할 수 있다.
+
+```javascript
+function* sumGen() {
+  let a = yield;
+  let b = yield;
+  return a + b;
+}
+
+const sum = sumGen();
+sum.next();   // 생성
+sum.next(1);  // a 에 1
+sum.next(2);  // b 에 2, return 3
+sum.next();   // { value : undefiend, done : true }
+```
+
+> 참고
+> 
+> next 에 파라미터는 1개만 입력이 가능하며, 추가로 더 입력하더라도 가장 처음 전달된 파라미터가 다음 yield 에 할당된다.
