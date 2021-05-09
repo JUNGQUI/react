@@ -72,11 +72,8 @@ TODO 추후 진행
 
 - Redux-saga
 
-기본적인 틀은 thunks 와 비슷하다. 다른 점은 generator 를 사용하는 점이다.
+기본적인 틀은 thunks 와 비슷하다. 다른 점은 [generator](../es6/ES6.md) 를 사용하는 점이다.
 
-> generator?
-> 
-> 
 
 ```javascript
 export default function* () {

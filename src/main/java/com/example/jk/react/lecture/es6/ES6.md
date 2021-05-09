@@ -40,3 +40,48 @@ const classes = `header ${ isLargeScreen() ? '' :
 다시 템플릿 리터럴로 표현해서 값에 대한 연산을 진행하는 것을 볼 수 있다.
 
 - [template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)
+
+### generator
+
+ES6 iterator 개념처럼 제너레이터 함수를 구현하고 내부에 yield 를 통해 선언하면 `.next()` 함수를 통해
+다음 단계에 접근이 가능하다.
+
+```javascript
+function* fn1() {
+  console.log('f1');
+  yield 10;
+  console.log('f2');
+  yield 20;
+  console.log('f3');
+  return 'finished';
+}
+
+const gen = fn1();
+console.log(gen.next());
+// f1
+// { value : 10, done : false}
+console.log(gen.next());
+// f2
+// { value : 20, done : false}
+console.log(gen.next());
+// f3
+// { value : 'finished', done : true}
+```
+
+위 예시처럼 yield 를 하나의 기준점으로 삼고 자바스크립트 객체를 반환하기에, effects 를 활용해서 액션을 디스패치하고 그 결과를 중간 중간에
+사용하여 동기/비동기적으로 main flow 와는 다르게 별도의 flow 로 데이터 처리가 가능하다.
+
+한 가지 중요하게 볼 점은 이터레이터 이자 제어권이 외부에 있기에 (.next() 를 통해 다음 진행) 아래와 같은 코드가 버그가 아니다.
+
+```javascript
+function* iteratorWhile() {
+  let count = 0;
+  while(true) {
+    count++;
+    yield count;
+  }
+}
+```
+
+얼핏 보기엔 무한루프이기에 에러가 발생할 것으로 보이지만 제너레이터는 1회 수행 후 yield 에서 제어권을 호출한 쪽으로 넘기기에 단계마다 1씩
+증가된 카운터를 가져 올 수 있다.
