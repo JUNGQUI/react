@@ -81,7 +81,7 @@ export default function* () {
 }
 ```
 
-- function* : 
+- function* : Generator function 으로 return 으로 generator 를 반환한다.
 - yield : 사가 미들웨어에 해당 effects 를 등록해준다. 이를 통해 미들웨어는 해당 effects 사용이 가능해진다.
 - effect
  
