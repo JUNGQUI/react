@@ -115,4 +115,27 @@ function* fetchData(action) {
 
 위와 같이 리덕스-사가를 이용해 특정 비동기 작업 진행 중 예외가 발생하더라도 해당 예외에 맞게 기존 fetch 된 데이터에 대한 변경도 가능하다.
 
-- debounce
+- Throttle, Debounce
+
+일부러 fetch 중 지연을 걸고 1회만 호출되게끔 하는 기법이다. 주로 짧은 시간 내에 같은 이벤트가 발생 할 경우 이런 방법을 쓰며
+대표적인 예시로는 검색창의 자동 단어 완성 기능이다.
+
+```javascript
+export function* saga_throttle() {
+  yield throttle(500, 'INPUT_CHANGED', handleInput)
+}
+```
+
+위 throttle 은 0.5초간 `INPUT_CHANGED` 액션에 대해 지연을 거는데, 가장 처음에 접근한 액션에 대해서만 1회 호출한다.
+즉 최초 접근 이후 0.5초동안 접근하는 `INPUT_CHANGED` 액션에 대해서는 디스패치 하지 않는다.
+
+```javascript
+export function* saga_debounce() {
+  yield debounce(500, 'INPUT_CHANGED', handleInput);
+}
+```
+
+거의 모든 조건은 동일하게 작동하는데, throttle 과는 다르게 가장 마지막에 입력된 action 에 대해 작업을 진행한다.
+
+따라서 위의 경우 0.5 초간 대기하며 별도의 추가 `INPUT_CHANGED` 액션이 없다면 가장 마지막에 요청받은 액션을 통해 handleInput 이 실행된다.
+
