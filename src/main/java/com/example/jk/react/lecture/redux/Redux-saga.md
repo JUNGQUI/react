@@ -139,3 +139,26 @@ export function* saga_debounce() {
 
 따라서 위의 경우 0.5 초간 대기하며 별도의 추가 `INPUT_CHANGED` 액션이 없다면 가장 마지막에 요청받은 액션을 통해 handleInput 이 실행된다.
 
+- test
+
+react-saga 의 경우 effects 함수가 리턴하는 값이 실행하는 '객체' 이므로 테스트하기가 간편하다.
+
+```javascript
+describe('test', () => {
+  // ...
+  const gen = cloneableGenerator(fetchData)(actions);           // 상태까지 복사 가능한 generator
+  expect(gen.next().value).toEqual(put(actions.setLoading()));  // generator 의 첫번째 yield
+  // ...
+  it('success', () => {
+    const successGen = gen.clone();
+    expect(successGen().next(Promise.resolve()).value).toEqual(put(actions.SUCCESS())); // 성공 분기의 액션
+  });
+  it('fail', () => {
+    const failGen = gen.clone();
+    expect(failGen().throw(err).value).toEqual(put(actions.FAIL()));       // 실패 분기의 액션
+  });
+});
+```
+
+이와 같이 effects 함수들이 모두 객체를 반환하기에 실행하면서 실제 예측가능한 객체를 비교 대상군으로 뽑아서 equal 조건을 달아서
+확인이 가능하다.
