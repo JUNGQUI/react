@@ -68,8 +68,6 @@ thunk 내에서도 dispatch, getState 를 파라미터로 받을 수 있고 이�
 
 RxJS 기반으로 만들어진 비동기 처리 미들웨어로 Rx 즉, 리액티브 프로그래밍 기반이기에 진입장벽이 높다.
 
-TODO 추후 진행
-
 - Redux-saga
 
 기본적인 틀은 thunks 와 비슷하다. 다른 점은 [generator](../es6/ES6.md) 를 사용하는 점이다.
